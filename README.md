@@ -11,7 +11,7 @@ git clone https://github.com/mahmoud20212/E-Learning-Platform.git
 
 ### Run Project
 ### Run in production environment
-**This Project use Docker so you need install docker befor started run project**
+- **This Project use Docker so you need install docker befor started run project**
 
 - Run following command from project folder in the shell to start project:
 ```
