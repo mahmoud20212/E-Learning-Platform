@@ -9,9 +9,8 @@ This is an E-Learning Platform content **management system (CMS)** project creat
 git clone https://github.com/mahmoud20212/E-Learning-Platform.git
 ```
 
-### Run Project
-### Run in production environment
-- **This Project use Docker so you need install docker befor started run project**
+### Run project in production environment
+_**This Project use Docker so you need install docker befor started run project**_
 
 - Run following command from project folder in the shell to start project:
 ```
@@ -31,7 +30,7 @@ docker compose exec web python /code/educa/manage.py createsuperuser
 docker compose exec web python /code/educa/manage.py collectstatic
 ```
 
-### Run in local environment
+### Run project in local environment
 - To run the project in local environment install (requirements.txt)
 
 - And run this command:
