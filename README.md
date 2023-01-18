@@ -1,7 +1,7 @@
 # E-Learning-Platform
 
 ## Introduction
-This is an E-Learning Platform content **management system (CMS)** project create using **Django**
+This is an E-Learning Platform **content management system (CMS)** project create using **Django**
 
 ## Deployment
 ### Clone the project
