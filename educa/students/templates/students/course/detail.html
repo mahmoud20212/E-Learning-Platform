@@ -1,47 +1,232 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
 {% load cache %}
 {% block title %}
-    {{ object.title }}
+  Educa | {{ object.title }}
+{% endblock %}
+{% block header %}
+  {{ object.title }}
 {% endblock %}
 {% block content %}
-<h1>
-    {{ module.title }}
-</h1>
-<div style="display: flex;">
-    <div class="contents">
-        <h3>Modules</h3>
-        <ul id="modules">
+  <section class="grid items-start gap-6 lg:grid-cols-12">
+    <aside class="self-start lg:col-span-4 xl:col-span-3">
+      <div class="sticky top-24 space-y-4">
+        <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <div class="border-b border-gray-100 px-5 py-4">
+            <h2 class="mt-2 text-lg font-semibold text-gray-900">Modules</h2>
+          </div>
+
+          <ul id="modules" class="p-3">
             {% for m in object.modules.all %}
-            <li data-id="{{ m.id }}" {% if m == module %}class="selected" {% endif %}>
-                <a href="{% url 'student_course_detail_module' object.id m.id %}">
-                    <span>
-                        Module <span class="order">{{ m.order|add:1 }}</span>
+              <li data-id="{{ m.id }}" class="{% if not forloop.first %}mt-2{% endif %}">
+                <a href="{% url 'student_course_detail_module' object.id m.id %}"
+                  class="block rounded-xl px-4 py-3 transition {% if m == module %}
+                    bg-gray-900 text-white shadow-sm
+                  {% else %}
+                    text-gray-700 hover:bg-gray-100
+                  {% endif %}">
+                  <span class="block text-xs font-semibold uppercase tracking-[0.2em] {% if m == module %}
+                      text-gray-300
+                    {% else %}
+                      text-gray-500
+                    {% endif %}">
+                    Module {{ m.order|add:1 }}
+                  </span>
+                  <span class="mt-2 block text-sm font-medium leading-6">{{ m.title }}</span>
+                  {% if m.description %}
+                    <span class="mt-2 block text-xs leading-5 {% if m == module %}
+                        text-gray-300
+                      {% else %}
+                        text-gray-500
+                      {% endif %}">
+                      {{ m.description|truncatechars:90 }}
                     </span>
-                    <br>
-                    {{ m.title }}
+                  {% endif %}
                 </a>
-            </li>
+              </li>
             {% empty %}
-            <li>No modules yet.</li>
+              <li class="rounded-xl border border-dashed border-gray-200 px-4 py-5 text-sm text-gray-500">No modules yet.</li>
             {% endfor %}
-        </ul>
-        <h3>
-            <a href="{% url 'chat:course_chat_room' object.id %}">
-                Course chat room
-            </a>
-        </h3>
+          </ul>
+        </div>
+
+        <a href="{% url 'chat:course_chat_room' object.id %}" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700">
+          <i class="fa-regular fa-comments"></i>
+          Course chat room
+        </a>
+      </div>
+    </aside>
+
+    <div class="lg:col-span-8 xl:col-span-9">
+      <div class="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <div class="border-b border-gray-100 px-6 py-6 sm:px-8">
+          <p class="text-sm font-medium uppercase tracking-[0.2em] text-gray-500">Learning module</p>
+          <h1 class="mt-3 text-3xl font-semibold tracking-tight text-gray-900">{{ module.title }}</h1>
+          {% if module.description %}
+            <p class="mt-3 max-w-3xl text-sm leading-7 text-gray-600">{{ module.description }}</p>
+          {% endif %}
+        </div>
+
+        <div class="space-y-8 px-6 py-8 sm:px-8">
+          {% cache 600 module_contents_v2 module %}
+          {% for content in module.contents.all %}
+            {% with item=content.item %}
+              <article class="rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:p-6">
+                <h2 class="text-xl font-semibold text-gray-900">{{ item.title }}</h2>
+                <div class="prose mt-4 max-w-none text-gray-700 prose-p:leading-8">{{ item.render }}</div>
+              </article>
+            {% endwith %}
+          {% empty %}
+            <div class="rounded-2xl border border-dashed border-gray-300 bg-gray-50 p-8 text-center text-gray-500">No content available in this module yet.</div>
+          {% endfor %}
+          {% endcache %}
+        </div>
+      </div>
     </div>
-    <div class="module" style="flex: 1; max-width: none;">
-        <!-- Cache contents in tempalte -->
-        <!-- تم تمرير module مختلف لكل content عشان ما يصير في تعارض بعرض ال content ويعرض content ثانية -->
-        {% cache 600 module_contents module %}
-            {% for content in module.contents.all %}
-                {% with item=content.item %}
-                    <h2>{{ item.title }}</h2>
-                    {{ item.render }}
-                {% endwith %}
-            {% endfor %}
-        {% endcache %}
-    </div>
-</div>
+  </section>
+
+  <div class="fixed bottom-4 right-4 z-50 flex flex-col items-end gap-3 sm:bottom-6 sm:right-6">
+    <section id="larry-panel" class="hidden h-[min(31rem,calc(100vh-6rem))] w-[min(20rem,calc(100vw-1.5rem))] max-w-[calc(100vw-1.5rem)] overflow-hidden rounded-[1.1rem] border border-gray-200 bg-white shadow-[0_16px_45px_rgba(15,23,42,0.14)] max-sm:fixed max-sm:bottom-22 max-sm:left-3 max-sm:right-3 max-sm:h-[calc(100vh-8.5rem)] max-sm:w-auto max-sm:max-w-none" aria-labelledby="larry-assistant-title">
+      <div class="flex h-full flex-col">
+        <div class="border-b border-gray-200 bg-white px-3 py-3 text-gray-900">
+          <div class="flex items-center justify-between gap-3">
+            <div class="flex items-center gap-2.5">
+              <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gray-900 text-sm text-white">
+                <i class="fa-solid fa-robot"></i>
+              </div>
+              <div>
+                <h2 id="larry-assistant-title" class="text-sm font-semibold">Larry</h2>
+              </div>
+            </div>
+            <button id="larry-close" type="button" class="inline-flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 text-gray-600 transition hover:bg-gray-200" aria-label="Close Larry chat"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        </div>
+
+        <div class="flex min-h-0 flex-1 flex-col px-3 py-3">
+          <div id="larry-messages" class="flex min-h-0 flex-1 flex-col gap-2.5 overflow-x-hidden overflow-y-auto rounded-xl bg-gray-50 p-3">
+            {% if assistant_messages %}
+              {% for assistant_message in assistant_messages %}
+                <div class="flex {% if assistant_message.role == 'user' %}
+                    justify-end
+                  {% else %}
+                    justify-start
+                  {% endif %}">
+                  <div class="max-w-[88%] space-y-1.5">
+                    <div class="break-words whitespace-pre-wrap rounded-xl px-3 py-2 text-sm leading-6 shadow-sm {% if assistant_message.role == 'user' %}
+                        bg-gray-900 text-white
+                      {% else %}
+                        border border-gray-200 bg-white text-gray-800
+                      {% endif %}">{{ assistant_message.content }}</div>
+                    {% if assistant_message.sent_at %}
+                      <p class="px-1 text-[11px] text-gray-400 {% if assistant_message.role == 'user' %}
+                          text-right
+                        {% else %}
+                          text-left
+                        {% endif %}">{{ assistant_message.sent_at }}</p>
+                    {% endif %}
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="flex justify-start">
+                <div class="max-w-[88%] space-y-1.5">
+                  <div class="break-words whitespace-pre-wrap rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm leading-6 text-gray-800 shadow-sm">Hello {% if request.user.get_full_name %}{{ request.user.first_name }}{% endif %}, I'm Larry. Ask me anything about this course and I'll help you study.</div>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+
+          <form id="larry-form" class="mt-3 space-y-2 border-t border-gray-100 pt-3">
+            {% csrf_token %}
+            <textarea id="larry-input" rows="2" class="block w-full resize-none rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 shadow-sm outline-none transition focus:border-indigo-500 focus:ring-2 focus:ring-indigo-200" placeholder="Ask Larry..."></textarea>
+            <div class="flex items-center justify-between gap-3">
+              <p id="larry-status" class="text-xs leading-6 text-gray-500">Ready.</p>
+              <button id="larry-submit" type="submit" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-gray-900 px-3.5 py-2 text-sm font-medium text-white shadow-sm transition hover:bg-gray-700 disabled:cursor-not-allowed disabled:bg-gray-400">
+                <i class="fa-solid fa-paper-plane"></i>
+                Send
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <button id="larry-toggle" type="button" class="group inline-flex h-13 w-13 items-center justify-center rounded-full bg-gradient-to-br from-slate-950 via-indigo-700 to-violet-500 text-lg text-white shadow-[0_18px_50px_rgba(79,70,229,0.45)] transition hover:scale-105 hover:shadow-[0_24px_60px_rgba(79,70,229,0.55)] sm:h-14 sm:w-14 sm:text-xl" aria-controls="larry-panel" aria-expanded="false" aria-label="Open Larry assistant"><i class="fa-solid fa-robot transition group-hover:rotate-6"></i></button>
+  </div>
+{% endblock %}
+
+{% block include_js %}
+  <style>
+    @keyframes larryTypingPulse {
+      0%, 80%, 100% {
+        opacity: 0.35;
+        transform: translateY(0);
+      }
+
+      40% {
+        opacity: 1;
+        transform: translateY(-2px);
+      }
+    }
+  </style>
+  <script>
+    window.larryAssistantConfig = {
+      endpoint: '{{ assistant_endpoint|escapejs }}'
+    }
+  </script>
+{% endblock %}
+
+{% block domready %}
+  const larryConfig = window.larryAssistantConfig; const larryForm = document.getElementById('larry-form'); const larryInput = document.getElementById('larry-input'); const larryMessages = document.getElementById('larry-messages'); const larryStatus = document.getElementById('larry-status'); const larrySubmit = document.getElementById('larry-submit'); const larryToggle = document.getElementById('larry-toggle'); const larryPanel = document.getElementById('larry-panel'); const larryClose = document.getElementById('larry-close'); const csrfTokenInput = larryForm ? larryForm.querySelector('input[name="csrfmiddlewaretoken"]') : null;
+
+  function openLarryPanel() { if (!larryPanel || !larryToggle) { return; } larryPanel.classList.remove('hidden'); larryToggle.setAttribute('aria-expanded', 'true'); larryMessages.scrollTop = larryMessages.scrollHeight; larryInput?.focus(); }
+
+  function closeLarryPanel() { if (!larryPanel || !larryToggle) { return; } larryPanel.classList.add('hidden'); larryToggle.setAttribute('aria-expanded', 'false'); }
+
+  function appendLarryMessage(role, content, sentAt = '') { const wrapper = document.createElement('div'); wrapper.className = role === 'user' ? 'flex justify-end' : 'flex justify-start';
+
+  const contentGroup = document.createElement('div'); contentGroup.className = 'max-w-[88%] space-y-1.5';
+
+  const bubble = document.createElement('div'); bubble.className = role === 'user' ? 'break-words whitespace-pre-wrap rounded-xl bg-gray-900 px-3 py-2 text-sm leading-6 text-white shadow-sm' : 'break-words whitespace-pre-wrap rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm leading-6 text-gray-800 shadow-sm'; bubble.innerHTML = String(content).replace(/\n/g, '<br />');
+
+  contentGroup.appendChild(bubble);
+
+  if (sentAt) { const stamp = document.createElement('p'); stamp.className = role === 'user' ? 'px-1 text-right text-[11px] text-gray-400' : 'px-1 text-left text-[11px] text-gray-400'; stamp.textContent = sentAt; contentGroup.appendChild(stamp); }
+
+  wrapper.appendChild(contentGroup); larryMessages.appendChild(wrapper); larryMessages.scrollTop = larryMessages.scrollHeight; }
+
+  function removeLarryTypingIndicator() { const existingIndicator = document.getElementById('larry-typing-indicator'); if (existingIndicator) { existingIndicator.remove(); } }
+
+  function showLarryTypingIndicator() { removeLarryTypingIndicator();
+
+  const wrapper = document.createElement('div'); wrapper.id = 'larry-typing-indicator'; wrapper.className = 'flex justify-start';
+
+  const contentGroup = document.createElement('div'); contentGroup.className = 'max-w-[88%] space-y-1.5';
+
+  const bubble = document.createElement('div'); bubble.className = 'inline-flex items-center gap-1 px-1 py-1 text-gray-400';
+
+  for (let index = 0; index < 3; index += 1) { const dot = document.createElement('span'); dot.className = 'h-1.5 w-1.5 rounded-full bg-gray-400'; dot.style.animation = `larryTypingPulse 1.2s ${index * 0.18}s infinite`; bubble.appendChild(dot); }
+
+  const label = document.createElement('span'); label.className = 'ml-1 text-[11px] text-gray-400'; label.textContent = 'Larry is typing'; bubble.appendChild(label);
+
+  contentGroup.appendChild(bubble); wrapper.appendChild(contentGroup); larryMessages.appendChild(wrapper); larryMessages.scrollTop = larryMessages.scrollHeight; }
+
+  larryForm?.addEventListener('submit', async function (event) { event.preventDefault();
+
+  const message = larryInput.value.trim(); if (!message) { larryStatus.textContent = 'Write a message before sending.'; return; }
+
+  const userTimestamp = new Date().toLocaleString([], { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit', }); appendLarryMessage('user', message, userTimestamp); openLarryPanel(); larryInput.value = ''; larrySubmit.disabled = true; larryStatus.textContent = 'Larry is thinking...'; showLarryTypingIndicator();
+
+  try { const response = await fetch(larryConfig.endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfTokenInput ? csrfTokenInput.value : '', }, body: JSON.stringify({ message }), });
+
+  const payload = await response.json(); if (!response.ok) { throw new Error(payload.error || 'Larry could not answer right now.'); }
+
+  const answer = payload.answer || 'Larry did not return an answer.'; removeLarryTypingIndicator();
+
+  appendLarryMessage('assistant', answer, payload.sent_at || ''); larryStatus.textContent = 'Larry is ready for the next question.'; } catch (error) { removeLarryTypingIndicator(); appendLarryMessage('assistant', error.message || 'Larry could not answer right now.'); larryStatus.textContent = 'Larry hit an error. Try again.'; } finally { larrySubmit.disabled = false; larryInput.focus(); } });
+
+  larryToggle?.addEventListener('click', function () { if (larryPanel?.classList.contains('hidden')) { openLarryPanel(); return; } closeLarryPanel(); });
+
+  larryClose?.addEventListener('click', function () { closeLarryPanel(); });
+
+  if (larryMessages) { larryMessages.scrollTop = larryMessages.scrollHeight; }
 {% endblock %}

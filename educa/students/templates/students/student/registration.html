@@ -1,17 +1,85 @@
 {% extends "base.html" %}
 {% block title %}
-    Sign up
+    Educa | Sign up
 {% endblock %}
+{% block header %}Sign up{% endblock %}
 {% block content %}
-<h1>
-    Sign up
-</h1>
-<div class="module">
-    <p>Enter your details to create an account:</p>
-    <form method="post">
-        {{ form.as_p }}
+<section class="mx-auto max-w-xl">
+<div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+    <style>
+        #signup-form input:not([type="hidden"]) {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            background: #ffffff;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            color: #111827;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #signup-form input:not([type="hidden"]):focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+
+        #signup-form label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #1f2937;
+        }
+
+        #signup-form ul {
+            margin-top: 0.5rem;
+            margin-left: 1rem;
+            list-style: disc;
+            color: #4b5563;
+        }
+    </style>
+    <p class="mb-4 text-sm text-gray-600">Enter your details to create an account:</p>
+    <form id="signup-form" method="post">
         {% csrf_token %}
-        <p><input type="submit" value="Create my account"></p>
+
+        {% if form.non_field_errors %}
+        <div class="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+            {% for error in form.non_field_errors %}
+            <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="space-y-4">
+            {% for field in form %}
+            <div class="space-y-2">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+
+                {% if field.help_text %}
+                <div class="text-xs leading-6 text-gray-500">{{ field.help_text|safe }}</div>
+                {% endif %}
+
+                {% for error in field.errors %}
+                <p class="text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+        </div>
+
+        <p class="pt-3">
+            <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700">
+                <i class="fa-regular fa-user"></i>
+                Create my account
+            </button>
+        </p>
+
+        <p class="text-sm text-gray-600 mt-4">
+            Already have an account?
+            <a href="{% url 'login' %}" class="font-medium text-indigo-600 transition hover:text-indigo-700">Sign in</a>
+        </p>
     </form>
 </div>
+</section>
 {% endblock %}

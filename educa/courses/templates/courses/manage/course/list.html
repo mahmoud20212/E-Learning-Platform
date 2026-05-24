@@ -1,27 +1,63 @@
 {% extends "base.html" %}
-{% block title %}My courses{% endblock %}
+{% block title %}Educa | My courses{% endblock %}
+{% block header %}
+    My courses
+{% endblock %}
 {% block content %}
-<h1>My courses</h1>
-<div class="module">
-    {% for course in object_list %}
-    <div class="course-info">
-        <h3>{{ course.title }}</h3>
-        <p>
-            <a href="{% url 'course_edit' course.id %}">Edit</a>
-            <a href="{% url 'course_delete' course.id %}">Delete</a>
-            <a href="{% url 'course_module_update' course.id %}">Edit modules</a>
-            {% if course.modules.count > 0 %}
-                <a href="{% url 'module_content_list' course.modules.first.id %}">
+<section class="space-y-6">
+    <div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+        <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">Instructor dashboard</p>
+            <p class="mt-2 text-sm text-gray-600">Create, update, and manage your course content.</p>
+        </div>
+        <a href="{% url 'course_create' %}" class="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-gray-700">
+            <i class="fa-solid fa-circle-plus"></i>
+            Create new course
+        </a>
+    </div>
+
+    <div class="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+        {% for course in object_list %}
+        <article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+            <div class="flex items-center justify-between gap-3">
+                <span class="inline-flex rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-gray-600">
+                    {{ course.subject.title }}
+                </span>
+                <span class="text-sm text-gray-500">{{ course.modules.count }} modules</span>
+            </div>
+
+            <h2 class="mt-4 text-xl font-semibold leading-8 text-gray-900">{{ course.title }}</h2>
+
+            <div class="mt-6 flex flex-wrap gap-2">
+                <a href="{% url 'course_edit' course.id %}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
+                    <i class="fa-regular fa-pen-to-square"></i>
+                    Edit
+                </a>
+                <a href="{% url 'course_delete' course.id %}" class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm font-medium text-red-700 transition hover:bg-red-100">
+                    <i class="fa-regular fa-trash-can"></i>
+                    Delete
+                </a>
+                <a href="{% url 'course_module_update' course.id %}" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
+                    <i class="fa-solid fa-list-check"></i>
+                    Edit modules
+                </a>
+                {% if course.modules.count > 0 %}
+                <a href="{% url 'module_content_list' course.modules.first.id %}" class="inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white transition hover:bg-indigo-700">
+                    <i class="fa-solid fa-sliders"></i>
                     Manage contents
                 </a>
-            {% endif %}
-        </p>
+                {% endif %}
+            </div>
+        </article>
+        {% empty %}
+        <div class="rounded-2xl border border-dashed border-gray-300 bg-white p-8 text-center text-gray-500 shadow-sm md:col-span-2 xl:col-span-3">
+            <p>You haven't created any courses yet.</p>
+            <a href="{% url 'course_create' %}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700">
+                <i class="fa-solid fa-circle-plus"></i>
+                Create your first course
+            </a>
+        </div>
+        {% endfor %}
     </div>
-    {% empty %}
-    <p>You haven't created any courses yet.</p>
-    {% endfor %}
-    <p>
-        <a href="{% url 'course_create' %}" class="button">Create new course</a>
-    </p>
-</div>
+</section>
 {% endblock %}

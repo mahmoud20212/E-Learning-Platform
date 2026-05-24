@@ -1,2 +1,24 @@
-{% load embed_video_tags %}
-{% video item.url "small" %}
+{% load course %}
+<div class="mt-2 overflow-hidden rounded-2xl border border-gray-200 bg-white p-2">
+	{% with embed_url=item.url|youtube_embed_url %}
+	<div class="relative aspect-video w-full overflow-hidden rounded-xl bg-black">
+		{% if embed_url %}
+		<iframe
+			src="{{ embed_url }}"
+			title="{{ item.title }}"
+			class="absolute inset-0 h-full w-full"
+			loading="lazy"
+			allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+			referrerpolicy="strict-origin-when-cross-origin"
+			allowfullscreen
+		></iframe>
+		{% else %}
+		<div class="flex h-full items-center justify-center p-4 text-center">
+			<a href="{{ item.url }}" target="_blank" rel="noopener noreferrer" class="text-sm font-medium text-white underline">
+				Open video on YouTube
+			</a>
+		</div>
+		{% endif %}
+	</div>
+	{% endwith %}
+</div>

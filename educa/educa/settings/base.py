@@ -10,8 +10,10 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 from django.urls import reverse_lazy
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -30,6 +32,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'daphne',
     'courses.apps.CoursesConfig',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -132,12 +135,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_REDIRECT_URL = reverse_lazy('student_course_list')
 
+REDIS_HOST = '127.0.0.1'
+REDIS_PORT = 6379
+REDIS_DB = 0
+
 CACHES = {
     'default': {
         # 'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
         # 'LOCATION': '127.0.0.1:11211',
         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': 'redis://127.0.0.1:6379',
+        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
     }
 }
 
@@ -161,9 +168,35 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)],
+            'hosts': [(REDIS_HOST, REDIS_PORT)],
         },
     },
 }
 
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# AI / RAG settings
+GROQ_API_KEY = config('GROQ_API_KEY')
+GROQ_MODEL = config('GROQ_MODEL')
+HUGGINGFACEHUB_API_TOKEN = config('HUGGINGFACEHUB_API_TOKEN')
+RAG_EMBEDDING_MODEL = config('RAG_EMBEDDING_MODEL')
+
+# Chroma persistence location for local vector store
+RAG_CHROMA_PERSIST_DIR = BASE_DIR / 'data' / 'vectorstore' / 'chroma'
+
+# Retrieval tuning
+RAG_TOP_K = int(config('RAG_TOP_K', default='5'))
+
+# Embedding indexing behavior
+EMBEDDING_REINDEX_ASYNC = config('EMBEDDING_REINDEX_ASYNC', default=True, cast=bool)
+EMBEDDING_REINDEX_DEBOUNCE_SECONDS = int(
+    config('EMBEDDING_REINDEX_DEBOUNCE_SECONDS', default='45')
+)
+
+# Celery
+CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TIMEZONE = TIME_ZONE

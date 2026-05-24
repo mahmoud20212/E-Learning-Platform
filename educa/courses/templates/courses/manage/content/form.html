@@ -1,25 +1,97 @@
 {% extends "base.html" %}
 {% block title %}
+    Educa | 
     {% if object %}
         Edit content "{{ object.title }}"
     {% else %}
         Add new content
     {% endif %}
 {% endblock %}
-{% block content %}
-<h1>
+{% block header %}
     {% if object %}
-        Edit content "{{ object.title }}"
+        Edit content
     {% else %}
         Add new content
     {% endif %}
-</h1>
-<div class="module">
-    <h2>Course info</h2>
-    <form action="" method="post" enctype="multipart/form-data">
-        {{ form.as_p }}
-        {% csrf_token %}
-        <p><input type="submit" value="Save content"></p>
-    </form>
-</div>
+{% endblock %}
+{% block content %}
+<section class="mx-auto max-w-4xl space-y-6">
+    <style>
+        #content-form input:not([type="hidden"]):not([type="checkbox"]):not([type="radio"]),
+        #content-form select,
+        #content-form textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            background: #ffffff;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            color: #111827;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #content-form textarea {
+            min-height: 10rem;
+            resize: vertical;
+        }
+
+        #content-form input:focus,
+        #content-form select:focus,
+        #content-form textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+    </style>
+
+    <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="mb-6 border-b border-gray-100 pb-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">Content editor</p>
+            <h1 class="mt-2 text-2xl font-semibold text-gray-900 sm:text-3xl">
+                {% if object %}
+                    Edit content "{{ object.title }}"
+                {% else %}
+                    Add new content
+                {% endif %}
+            </h1>
+            <p class="mt-2 text-sm text-gray-600">Fill in the fields below, then save to add this content to the module.</p>
+        </div>
+
+        <form id="content-form" action="" method="post" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            {% for field in form %}
+            <div class="space-y-2">
+                <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-800">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}
+                <p class="text-xs text-gray-500">{{ field.help_text }}</p>
+                {% endif %}
+                {% for error in field.errors %}
+                <p class="text-sm text-red-600">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endfor %}
+
+            {% if form.non_field_errors %}
+            <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="flex flex-wrap items-center gap-3 pt-2">
+                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                    Save content
+                </button>
+                <a href="{% url 'module_content_list' request.resolver_match.kwargs.module_id %}" class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
 {% endblock %}

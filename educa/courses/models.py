@@ -4,6 +4,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey
 from .fields import OrderField
 from django.template.loader import render_to_string
+from pgvector.django import VectorField
 
 class Subject(models.Model):
     title = models.CharField(max_length=200)
@@ -99,3 +100,36 @@ class Image(ItemBase):
 
 class Video(ItemBase):
     url = models.URLField()
+
+
+class CourseContentEmbedding(models.Model):
+    """Stores RAG chunks and vectors in Postgres/pgvector."""
+
+    course = models.ForeignKey(
+        Course,
+        related_name='content_embeddings',
+        on_delete=models.CASCADE,
+    )
+    module = models.ForeignKey(
+        Module,
+        related_name='content_embeddings',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    module_order = models.PositiveIntegerField(default=0, db_index=True)
+    chunk_id = models.CharField(max_length=255, unique=True)
+    source = models.CharField(max_length=255)
+    title = models.CharField(max_length=255, blank=True)
+    content = models.TextField()
+    embedding = VectorField(dimensions=384)
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['course', 'module_order']),
+        ]
+
+    def __str__(self):
+        return self.chunk_id

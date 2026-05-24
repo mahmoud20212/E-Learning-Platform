@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Subject, Course, Module
+from .models import Subject, Course, Module, CourseContentEmbedding
 
 @admin.register(Subject)
 class SubjectAdmin(admin.ModelAdmin):
@@ -16,3 +16,9 @@ class CourseAdmin(admin.ModelAdmin):
     search_fields = ['title', 'overview']
     prepopulated_fields = {'slug': ('title',)}
     inlines = [ModuleInline]
+
+@admin.register(CourseContentEmbedding)
+class CourseContentEmbeddingAdmin(admin.ModelAdmin):
+    list_display = ['course', 'module', 'title', 'source', 'created']
+    list_filter = ['created', 'course']
+    search_fields = ['title', 'content', 'source']

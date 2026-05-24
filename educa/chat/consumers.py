@@ -1,8 +1,10 @@
+from email.mime import message
 import json
 # from channels.generic.websocket import WebsocketConsumer
 from channels.generic.websocket import AsyncWebsocketConsumer
 # from asgiref.sync import async_to_sync
 from django.utils import timezone
+from .models import Message
 
 # class ChatConsumer(WebsocketConsumer):
 #     def connect(self):
@@ -66,6 +68,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.room_group_name,
             self.channel_name,
         )
+    
+    async def persist_message(self, message):
+        # send message to WebSocket
+        await Message.objects.acreate(
+            user=self.user, course_id=self.id, content=message
+        )
 
     # receive message from WebSocket
     async def receive(self, text_data):
@@ -80,9 +88,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message,
                 'user': self.user.username,
                 'datetime': now.isoformat(),
-
             }
         )
+        # persist message
+        await self.persist_message(message)
         # # send message to WebSocket
         # self.send(text_data=json.dumps({'message': message}))
     

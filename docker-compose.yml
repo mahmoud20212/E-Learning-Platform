@@ -7,8 +7,10 @@ services:
       - ./data/cache:/data
 
   db:
-    image: postgres:14.5
+    image: pgvector/pgvector:pg14
     restart: always
+    ports:
+      - "5433:5432"
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
@@ -18,8 +20,7 @@ services:
 
   web:
     build: .
-    command: ["./wait-for-it.sh", "db:5432", "--",
-              "uwsgi", "--ini", "/code/config/uwsgi/uwsgi.ini"]
+    command: start-web.sh
     restart: always
     volumes:
       - .:/code
@@ -35,9 +36,7 @@ services:
   daphne:
     build: .
     working_dir: /code/educa/
-    command: ["../wait-for-it.sh", "db:5432", "--",
-              "daphne", "-u", "/code/educa/daphne.sock",
-              "educa.asgi:application"]
+    command: start-daphne.sh
     restart: always
     volumes:
       - .:/code

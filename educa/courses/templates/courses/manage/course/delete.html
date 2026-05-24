@@ -1,12 +1,33 @@
 {% extends "base.html" %}
-{% block title %}Delete course{% endblock %}
+{% block title %}Educa | Delete course{% endblock %}
+{% block header %}
+    Delete course
+{% endblock %}
 {% block content %}
-<h1>Delete course "{{ object.title }}"</h1>
-<div class="module">
-    <form action="" method="post">
-        {% csrf_token %}
-        <p>Are you sure you want to delete "{{ object }}"?</p>
-        <input type="submit" value="Confirm">
-    </form>
-</div>
+<section class="mx-auto max-w-3xl">
+    <div class="rounded-3xl border border-red-200 bg-white shadow-sm">
+        <div class="border-b border-red-100 bg-red-50 px-6 py-5 sm:px-8">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-red-600">Danger zone</p>
+            <h1 class="mt-2 text-2xl font-semibold text-gray-900 sm:text-3xl">Delete course "{{ object.title }}"</h1>
+        </div>
+
+        <div class="space-y-6 px-6 py-6 sm:px-8">
+            <p class="text-sm leading-7 text-gray-700">
+                Are you sure you want to delete "{{ object }}"? This action cannot be undone.
+            </p>
+
+            <form action="" method="post" class="flex flex-wrap items-center gap-3">
+                {% csrf_token %}
+                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-red-600 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-red-700">
+                    <i class="fa-regular fa-trash-can"></i>
+                    Confirm delete
+                </button>
+                <a href="{% url 'manage_course_list' %}" class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Cancel
+                </a>
+            </form>
+        </div>
+    </div>
+</section>
 {% endblock %}

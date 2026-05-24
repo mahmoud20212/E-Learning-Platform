@@ -1,16 +1,109 @@
 {% extends "base.html" %}
 {% block title %}
-    Edit "{{ course.title }}"
+    Educa | Edit "{{ course.title }}"
+{% endblock %}
+{% block header %}
+    Edit modules
 {% endblock %}
 {% block content %}
-<h1>Edit "{{ course.title }}"</h1>
-<div class="module">
-    <h2>Course modules</h2>
-    <form method="post">
-        {{ formset }}
-        {{ formset.management_form }}
-        {% csrf_token %}
-        <input type="submit" value="Save modules">
-    </form>
-</div>
+<section class="mx-auto max-w-5xl space-y-6">
+    <style>
+        #module-formset input[type="text"],
+        #module-formset textarea {
+            width: 100%;
+            border: 1px solid #d1d5db;
+            border-radius: 0.75rem;
+            background: #ffffff;
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            color: #111827;
+            outline: none;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        #module-formset textarea {
+            min-height: 8.5rem;
+            resize: vertical;
+        }
+
+        #module-formset input[type="text"]:focus,
+        #module-formset textarea:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+        }
+    </style>
+
+    <div class="rounded-3xl border border-gray-200 bg-white p-6 shadow-sm sm:p-8">
+        <div class="mb-6 border-b border-gray-100 pb-5">
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">Course setup</p>
+            <h1 class="mt-2 text-2xl font-semibold text-gray-900 sm:text-3xl">Edit "{{ course.title }}"</h1>
+            <p class="mt-2 text-sm text-gray-600">Update module titles and descriptions, then save your changes.</p>
+        </div>
+
+        <form id="module-formset" method="post" class="space-y-4">
+            {% csrf_token %}
+            {{ formset.management_form }}
+
+            {% for form in formset %}
+            <article class="rounded-2xl border border-gray-200 bg-gray-50 p-5 sm:p-6">
+                <div class="mb-4 flex items-center justify-between gap-3">
+                    <h2 class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">Module {{ forloop.counter }}</h2>
+                    {% if form.instance.pk %}
+                    <span class="rounded-full bg-white px-3 py-1 text-xs font-medium text-gray-600">Existing</span>
+                    {% else %}
+                    <span class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">New</span>
+                    {% endif %}
+                </div>
+
+                {{ form.id }}
+                {{ form.course }}
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="{{ form.title.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-800">Title</label>
+                        {{ form.title }}
+                        {% for error in form.title.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div>
+                        <label for="{{ form.description.id_for_label }}" class="mb-2 block text-sm font-medium text-gray-800">Description</label>
+                        {{ form.description }}
+                        {% for error in form.description.errors %}
+                        <p class="mt-1 text-sm text-red-600">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+
+                    <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+                        <label for="{{ form.DELETE.id_for_label }}" class="inline-flex items-center gap-2 text-sm font-medium text-red-700">
+                            {{ form.DELETE }}
+                            Delete this module
+                        </label>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+
+            {% if formset.non_form_errors %}
+            <div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                {% for error in formset.non_form_errors %}
+                <p>{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="flex flex-wrap items-center gap-3 pt-2">
+                <button type="submit" class="inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700">
+                    <i class="fa-regular fa-floppy-disk"></i>
+                    Save modules
+                </button>
+                <a href="{% url 'manage_course_list' %}" class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-medium text-gray-700 transition hover:bg-gray-100">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    Back
+                </a>
+            </div>
+        </form>
+    </div>
+</section>
 {% endblock %}

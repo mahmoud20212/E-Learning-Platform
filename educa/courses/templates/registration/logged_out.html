@@ -1,11 +1,16 @@
 {% extends "base.html" %}
-{% block title %}Logged out{% endblock %}
+{% block title %}Educa | Logged out{% endblock %}
+{% block header %}Logged out{% endblock %}
 {% block content %}
-<h1>Logged out</h1>
-<div class="module">
-    <p>
-        You have been successfully logged out.
-        You can <a href="{% url 'login' %}">log-in again</a>.
-    </p>
-</div>
+<section class="mx-auto max-w-xl">
+    <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <p class="text-sm leading-7 text-gray-700">
+            You have been successfully logged out.
+        </p>
+        <a href="{% url 'login' %}" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-gray-900 px-5 py-2.5 text-sm font-medium text-white transition hover:bg-gray-700">
+            <i class="fa-solid fa-right-to-bracket"></i>
+            Sign in again
+        </a>
+    </div>
+</section>
 {% endblock %}

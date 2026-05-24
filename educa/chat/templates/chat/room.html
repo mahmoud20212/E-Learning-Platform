@@ -1,43 +1,126 @@
 {% extends "base.html" %}
 {% block title %}
-    Chat room for "{{ course.title }}"
+  Educa | Chat room for "{{ course.title }}"
+{% endblock %}
+{% block header %}
+  Course chat room
 {% endblock %}
 {% block content %}
-<div id="chat"></div>
-<div id="chat-input">
-    <input id="chat-message-input" type="text">
-    <input id="chat-message-submit" type="submit" value="Send">
-</div>
+<section>
+  <div class="overflow-hidden rounded-3xl border border-gray-200 bg-white shadow-sm">
+    <div class="border-b border-gray-100 px-6 py-6 sm:px-8">
+      <p class="text-xs font-semibold uppercase tracking-[0.24em] text-gray-500">Live discussion</p>
+      <h1 class="mt-2 text-3xl font-semibold tracking-tight text-gray-900">{{ course.title }}</h1>
+      <p class="mt-3 max-w-2xl text-sm leading-6 text-gray-600">
+          Collaborate with classmates, ask questions, and discuss each module in real time.
+      </p>
+    </div>
+
+    <div class="grid gap-0 lg:grid-cols-[280px_minmax(0,1fr)]">
+      <aside class="border-b border-gray-100 bg-gray-50 px-6 py-6 lg:border-r lg:border-b-0">
+        <h2 class="text-sm font-semibold uppercase tracking-[0.2em] text-gray-500">Chat guide</h2>
+        <div class="mt-4 space-y-3 text-sm leading-6 text-gray-600">
+          <p>Use this room for course questions, clarifications, and module discussion.</p>
+          <div class="rounded-2xl border border-gray-200 bg-white p-4">
+            <p class="font-medium text-gray-900">Best practice</p>
+            <p class="mt-2 text-sm text-gray-600">Keep messages short and focused so the thread stays easy to follow.</p>
+          </div>
+        </div>
+      </aside>
+
+      <div class="flex min-h-[34rem] flex-col">
+        <div id="chat" class="flex-1 space-y-4 overflow-y-auto bg-white px-6 py-6 sm:px-8">
+          {% for message in latest_messages %}
+          <div class="flex {% if message.user_id == request.user.id %}items-end{% else %}items-start{% endif %}">
+            <article class="max-w-xl rounded-2xl px-4 py-3 shadow-sm {% if message.user_id == request.user.id %}bg-gray-900 text-white{% else %}border border-gray-200 bg-gray-50 text-gray-900{% endif %}">
+              <div class="flex items-center gap-3 text-xs font-medium {% if message.user_id == request.user.id %}text-gray-300{% else %}text-gray-500{% endif %}">
+                <span>{% if message.user_id == request.user.id %}Me{% else %}{{ message.user.username }}{% endif %}</span>
+                <span>{{ message.sent_on|date:"g:i A" }}</span>
+              </div>
+              <p class="mt-2 text-sm leading-6">{{ message.content }}</p>
+            </article>
+          </div>
+          {% endfor %}
+        </div>
+        <div class="border-t border-gray-100 bg-gray-50 px-6 py-5 sm:px-8">
+          <div id="chat-input" class="flex flex-col gap-3 sm:flex-row">
+            <input id="chat-message-input" type="text" placeholder="Write your message..." class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 outline-none transition placeholder:text-gray-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100">
+            <button id="chat-message-submit" type="button" class="inline-flex cursor-pointer items-center justify-center gap-2 rounded-xl bg-indigo-600 px-5 py-3 text-sm font-medium text-white shadow-sm transition hover:bg-indigo-700">
+              <i class="fa-regular fa-paper-plane"></i>
+              Send
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 {% endblock %}
 
 {% block include_js %}
-    {{ course.id|json_script:"course-id" }}
-    {{ request.user.username|json_script:"request-user" }}
+  {{ course.id|json_script:"course-id" }}
+  {{ request.user.username|json_script:"request-user" }}
 {% endblock %}
 
 {% block domready %}
     const courseId = JSON.parse(document.getElementById('course-id').textContent);
     const requestUser = JSON.parse(document.getElementById('request-user').textContent);
-    const url = `wss://${window.location.host}/ws/chat/room/${courseId}/`;
+    const url = `ws://${window.location.host}/ws/chat/room/${courseId}/`;
     const chatSocket = new WebSocket(url);
 
-    chatSocket.onmessage = function(event) {
-        const data = JSON.parse(event.data);
-        const chat = document.getElementById('chat');
+    const chat = document.getElementById('chat');
 
+    function escapeHtml(value) {
+      return value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function renderEmptyState() {
+        if (!chat.children.length) {
+            chat.innerHTML = `<div id="chat-empty-state" class="flex h-full min-h-[20rem] items-center justify-center rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 text-center text-sm text-gray-500">
+                                No messages yet. Start the conversation.
+                              </div>`;
+        }
+    }
+
+    function appendMessage(data) {
         const dateOptions = {hour: 'numeric', minute: 'numeric', hour12: true};
         const datetime = new Date(data.datetime).toLocaleString('en', dateOptions);
         const isMe = data.user === requestUser;
-        const source = isMe ? 'me' : 'other';
         const name = isMe ? 'Me' : data.user;
+        const alignClass = isMe ? 'items-end' : 'items-start';
+        const bubbleClass = isMe
+            ? 'bg-gray-900 text-white'
+            : 'border border-gray-200 bg-gray-50 text-gray-900';
+        const metaClass = isMe ? 'text-gray-300' : 'text-gray-500';
+        const emptyState = document.getElementById('chat-empty-state');
 
-        chat.innerHTML += `<div class="message ${source}">
-                                <strong>${name}</strong>
-                                <span class="date">${datetime}</span>
-                                <br>
-                                ${data.message}
-                            </div>`;
+        if (emptyState) {
+            emptyState.remove();
+        }
+
+        chat.insertAdjacentHTML('beforeend', `<div class="flex ${alignClass}">
+                <article class="max-w-xl rounded-2xl px-4 py-3 shadow-sm ${bubbleClass}">
+                    <div class="flex items-center gap-3 text-xs font-medium ${metaClass}">
+                        <span>${escapeHtml(name)}</span>
+                        <span>${escapeHtml(datetime)}</span>
+                    </div>
+                    <p class="mt-2 text-sm leading-6">${escapeHtml(data.message)}</p>
+                </article>
+            </div>`);
         chat.scrollTop = chat.scrollHeight;
+    }
+
+    renderEmptyState();
+    chat.scrollTop = chat.scrollHeight;
+
+    chatSocket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        appendMessage(data);
     };
 
     chatSocket.onclose = function(event) {

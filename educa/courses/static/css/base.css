@@ -96,6 +96,9 @@ h1 {
     margin:0 0 10px 0;
     padding:4px 10px 10px;
     overflow:auto;
+}
+
+.contents ul.owner li{
     cursor:move;
 }
 
@@ -128,6 +131,9 @@ h1 {
 
 .contents ul a:hover {
     color:#4dcc43;
+}
+
+.contents ul.owner a:hover {
     cursor:move;
 }
 

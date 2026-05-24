@@ -1,0 +1,33 @@
+{% if breadcrumbs %}
+<nav aria-label="Breadcrumb" class="bg-white border-b border-gray-200">
+  <div class="mx-auto max-w-7xl py-2 sm:py-3 px-4 sm:px-6 lg:px-8">
+    <ol role="list" class="flex items-center space-x-1 sm:space-x-2 overflow-x-auto">
+      <!-- Home Link -->
+      <li class="flex-shrink-0">
+        <div class="flex items-center">
+          <a href="/" class="text-gray-400 hover:text-gray-500 transition" title="Home">
+            <i class="fa-solid fa-house text-sm sm:text-lg"></i>
+            <span class="sr-only">Home</span>
+          </a>
+        </div>
+      </li>
+
+      <!-- Dynamic Breadcrumbs -->
+      {% for item in breadcrumbs %}
+      <li class="flex items-center flex-shrink-0">
+        <div class="flex items-center gap-1 sm:gap-2">
+          <i class="fa-solid fa-chevron-right text-gray-300 text-xs sm:text-sm"></i>
+          {% if item.url %}
+            <a href="{{ item.url }}" class="text-gray-600 hover:text-gray-900 text-xs sm:text-sm font-medium transition truncate whitespace-nowrap">
+              {{ item.label }}
+            </a>
+          {% else %}
+            <span class="text-gray-900 text-xs sm:text-sm font-medium truncate whitespace-nowrap">{{ item.label }}</span>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</nav>
+{% endif %}
