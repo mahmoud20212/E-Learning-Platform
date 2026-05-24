@@ -31,7 +31,10 @@ DATABASES = {
 REDIS_PASSWORD = config('REDIS_PASSWORD')
 REDIS_HOST = config('REDIS_HOST')
 REDIS_PORT = config('REDIS_PORT', cast=int)
+
 REDIS_URL = f'rediss://default:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
+CELERY_REDIS_URL = f'{REDIS_URL}?ssl_cert_reqs=none'
+
 REDIS_DB = 0
 
 if REDIS_URL:
@@ -39,6 +42,11 @@ if REDIS_URL:
         'default': {
             'BACKEND': 'django.core.cache.backends.redis.RedisCache',
             'LOCATION': REDIS_URL,
+            'OPTIONS': {
+                'CONNECTION_POOL_KWARGS': {
+                    'ssl_cert_reqs': None
+                }
+            }
         }
     }
 
@@ -51,9 +59,16 @@ if REDIS_URL:
         },
     }
 
-    # Celery
-    CELERY_BROKER_URL = REDIS_URL
-    CELERY_RESULT_BACKEND = REDIS_URL
+    CELERY_BROKER_URL = CELERY_REDIS_URL
+    CELERY_RESULT_BACKEND = CELERY_REDIS_URL
+    
+    # إخبار Celery بعدم التشدد في فحص شهادة الأمان للـ Redis
+    CELERY_BROKER_USE_SSL = {
+        'ssl_cert_reqs': None
+    }
+    CELERY_REDIS_BACKEND_USE_SSL = {
+        'ssl_cert_reqs': None
+    }
 
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
