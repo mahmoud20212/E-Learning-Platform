@@ -142,7 +142,7 @@ def get_conversation_memory_max_messages() -> int:
 
 
 def get_redis_url() -> str:
-    return f"redis://{settings.REDIS_HOST}:{settings.REDIS_PORT}/{settings.REDIS_DB}"
+    return f"{settings.REDIS_URL}/{settings.REDIS_DB}"
 
 
 @lru_cache(maxsize=1)

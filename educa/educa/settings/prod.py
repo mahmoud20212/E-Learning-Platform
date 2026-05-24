@@ -24,7 +24,10 @@ DATABASES = {
     }
 }
 
-REDIS_URL = config('REDIS_URL')
+REDIS_PASSWORD = config('REDIS_PASSWORD')
+REDIS_HOST = config('REDIS_HOST')
+REDIS_PORT = config('REDIS_PORT', cast=int)
+REDIS_URL = f'rediss://default:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
 REDIS_DB = 0
 
 CACHES = {
