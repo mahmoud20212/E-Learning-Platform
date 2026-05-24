@@ -8,6 +8,12 @@ ADMINS = [
 
 ALLOWED_HOSTS = ['*']
 
+if 'courses.middleware.subdomain_course_middleware' in MIDDLEWARE:
+    MIDDLEWARE.remove('courses.middleware.subdomain_course_middleware')
+
+if 'debug_toolbar.middleware.DebugToolbarMiddleware' in MIDDLEWARE:
+    MIDDLEWARE.remove('debug_toolbar.middleware.DebugToolbarMiddleware')
+
 # إعداد Whitenoise للملفات الثابتة
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
