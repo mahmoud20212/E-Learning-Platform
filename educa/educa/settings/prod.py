@@ -1,16 +1,22 @@
 from .base import *
 
-DEBUG = False
+DEBUG = True
 
 ADMINS = [
-    ('Mahmoud', 'email@mydomain.com'),
+    ('Mahmoud Ouda', 'email@mydomain.com'),
 ]
 
 ALLOWED_HOSTS = ['*']
-# ALLOWED_HOSTS = ['educaproject.com', 'www.educaproject.com']
-# ALLOWED_HOSTS = ['.educaproject.com']
 
-# Whitenoise settings
+# 2. إيقاف الـ Subdomain Middleware والـ Debug Toolbar القادمين من base.py لحل مشكلة الـ 404
+# نقوم بحذفهم من القائمة المستوردة لمنع تداخلهم في بيئة الإنتاج
+if 'courses.middleware.subdomain_course_middleware' in MIDDLEWARE:
+    MIDDLEWARE.remove('courses.middleware.subdomain_course_middleware')
+
+if 'debug_toolbar.middleware.DebugToolbarMiddleware' in MIDDLEWARE:
+    MIDDLEWARE.remove('debug_toolbar.middleware.DebugToolbarMiddleware')
+
+# إعداد Whitenoise للملفات الثابتة
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 DATABASES = {
@@ -30,32 +36,33 @@ REDIS_PORT = config('REDIS_PORT', cast=int)
 REDIS_URL = f'rediss://default:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}'
 REDIS_DB = 0
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': f'{REDIS_URL}/{REDIS_DB}',
+if REDIS_URL:
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+            'LOCATION': REDIS_URL,
+        }
     }
-}
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+    CHANNEL_LAYERS = {
+        'default': {
+            'BACKEND': 'channels_redis.core.RedisChannelLayer',
             'CONFIG': {
-            'hosts': [REDIS_URL],
+                'hosts': [REDIS_URL],
+            },
         },
-    },
-}
+    }
 
-# Celery
-CELERY_BROKER_URL = REDIS_URL
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+    # Celery
+    CELERY_BROKER_URL = REDIS_URL
+    CELERY_RESULT_BACKEND = REDIS_URL
+
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TIMEZONE = TIME_ZONE
 
-
-# Security
+# 5. إعدادات الأمان والـ SSL (متوافقة 100% مع الـ Proxy الخاص بـ Render لمنع الـ Redirect Loop)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
