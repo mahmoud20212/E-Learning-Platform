@@ -1,0 +1,32 @@
+# Ignore everything by default, then explicitly allow needed files.
+**
+
+# Build/runtime essentials
+!Dockerfile
+!docker-compose.yml
+!requirements.txt
+!start-web.sh
+!start-daphne.sh
+!wait-for-it.sh
+
+# App source/config needed in image
+!educa/**
+!config/**
+!api_examples/**
+
+# Re-exclude local heavy/runtime artifacts
+educa/static/**
+educa/media/**
+educa/db.sqlite3
+data/**
+
+# Python/cache/temp artifacts
+venv/**
+**/__pycache__/**
+**/*.pyc
+**/*.pyo
+**/*.pyd
+**/*.sock
+**/*.sock.lock
+.git/**
+.env

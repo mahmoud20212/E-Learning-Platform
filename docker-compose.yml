@@ -1,10 +1,10 @@
 services:
 
-  cache:
-    image: redis:7.0.4
-    restart: always
-    volumes:
-      - ./data/cache:/data
+  # cache:
+  #   image: redis:7.0.4
+  #   restart: always
+  #   volumes:
+  #     - ./data/cache:/data
 
   db:
     image: pgvector/pgvector:pg14
@@ -28,10 +28,14 @@ services:
       - DJANGO_SETTINGS_MODULE=educa.settings.prod
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    depends_on:
-      - db
-      - cache
+      - POSTGRES_PASSWORD=w3ALeOIK1mwkF8AA
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=db.prvumqyjsuecguyfsiww.supabase.co
+      - REDIS_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
+      - CELERY_BROKER_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
+    # depends_on:
+    #   - db
+    #   - cache
 
   daphne:
     build: .
@@ -44,17 +48,40 @@ services:
       - DJANGO_SETTINGS_MODULE=educa.settings.prod
       - POSTGRES_DB=postgres
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
-    depends_on:
-      - db
-      - cache
+      - POSTGRES_PASSWORD=w3ALeOIK1mwkF8AA
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=db.prvumqyjsuecguyfsiww.supabase.co
+      - REDIS_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
+      - CELERY_BROKER_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
+    # depends_on:
+    #   - db
+    #   - cache
 
-  nginx:
-    image: nginx:1.23.1
+  celery_worker:
+    build: .
+    working_dir: /code/educa/
+    command: /bin/bash -c "sed -i 's/\r$//' /code/wait-for-it.sh; chmod +x /code/wait-for-it.sh; /code/wait-for-it.sh db:5432 -- celery -A educa worker -l info -P solo"
     restart: always
     volumes:
-      - ./config/nginx:/etc/nginx/templates
       - .:/code
-    ports:
-      - "80:80"
-      - "443:443"
+    environment:
+      - DJANGO_SETTINGS_MODULE=educa.settings.prod
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=w3ALeOIK1mwkF8AA
+      - POSTGRES_PORT=5432
+      - POSTGRES_HOST=db.prvumqyjsuecguyfsiww.supabase.co
+      - CELERY_BROKER_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
+    # depends_on:
+    #   - db
+    #   - cache
+
+  # nginx:
+  #   image: nginx:1.23.1
+  #   restart: always
+  #   volumes:
+  #     - ./config/nginx:/etc/nginx/templates
+  #     - .:/code
+  #   ports:
+  #     - "80:80"
+  #     - "443:443"

@@ -29,7 +29,7 @@
                     {% else %}
                       text-gray-500
                     {% endif %}">
-                    Module {{ m.order|add:1 }}
+                    Module {{ forloop.counter }}
                   </span>
                   <span class="mt-2 block text-sm font-medium leading-6">{{ m.title }}</span>
                   {% if m.description %}

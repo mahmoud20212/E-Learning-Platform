@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
-import os
 from pathlib import Path
 from django.urls import reverse_lazy
 from decouple import config
@@ -47,6 +46,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'chat',
     'channels',
+    'tailwind',
+    'theme',
 ]
 
 MIDDLEWARE = [
@@ -135,23 +136,6 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 LOGIN_REDIRECT_URL = reverse_lazy('student_course_list')
 
-REDIS_HOST = '127.0.0.1'
-REDIS_PORT = 6379
-REDIS_DB = 0
-
-CACHES = {
-    'default': {
-        # 'BACKEND': 'django.core.cache.backends.memcached.PyMemcacheCache',
-        # 'LOCATION': '127.0.0.1:11211',
-        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-        'LOCATION': f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}',
-    }
-}
-
-INTERNAL_IPS = [
-    '127.0.0.1',
-]
-
 # CACHE_MIDDLEWARE_ALIAS = 'default'
 # CACHE_MIDDLEWARE_SECONDS = 60 * 15 # 15 minutes
 # CACHE_MIDDLEWARE_KEY_PREFIX = 'educa'
@@ -164,25 +148,13 @@ REST_FRAMEWORK = {
 
 ASGI_APPLICATION = 'educa.asgi.application'
 
-CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-            'CONFIG': {
-            'hosts': [(REDIS_HOST, REDIS_PORT)],
-        },
-    },
-}
-
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+# EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # AI / RAG settings
 GROQ_API_KEY = config('GROQ_API_KEY')
 GROQ_MODEL = config('GROQ_MODEL')
 HUGGINGFACEHUB_API_TOKEN = config('HUGGINGFACEHUB_API_TOKEN')
 RAG_EMBEDDING_MODEL = config('RAG_EMBEDDING_MODEL')
-
-# Chroma persistence location for local vector store
-RAG_CHROMA_PERSIST_DIR = BASE_DIR / 'data' / 'vectorstore' / 'chroma'
 
 # Retrieval tuning
 RAG_TOP_K = int(config('RAG_TOP_K', default='5'))
@@ -193,10 +165,4 @@ EMBEDDING_REINDEX_DEBOUNCE_SECONDS = int(
     config('EMBEDDING_REINDEX_DEBOUNCE_SECONDS', default='45')
 )
 
-# Celery
-CELERY_BROKER_URL = f'redis://{REDIS_HOST}:{REDIS_PORT}/{REDIS_DB}'
-CELERY_RESULT_BACKEND = CELERY_BROKER_URL
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TIMEZONE = TIME_ZONE
+TAILWIND_APP_NAME = "theme"

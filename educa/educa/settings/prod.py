@@ -1,4 +1,3 @@
-import os
 from .base import *
 
 DEBUG = False
@@ -8,26 +7,49 @@ ADMINS = [
 ]
 
 ALLOWED_HOSTS = ['*']
-# # ALLOWED_HOSTS = ['educaproject.com', 'www.educaproject.com']
+# ALLOWED_HOSTS = ['educaproject.com', 'www.educaproject.com']
 # ALLOWED_HOSTS = ['.educaproject.com']
+
+# Whitenoise settings
+# MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_DB'),
-        'USER': os.environ.get('POSTGRES_USER'),
-        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'db',
-        'PORT': 5432,
+        'NAME': config('POSTGRES_DB'),
+        'USER': config('POSTGRES_USER'),
+        'PASSWORD': config('POSTGRES_PASSWORD'),
+        'HOST': config('POSTGRES_HOST'),
+        'PORT': config('POSTGRES_PORT'),
     }
 }
 
-REDIS_URL = 'redis://cache:6379'
-REDIS_HOST = 'cache'
-REDIS_PORT = 6379
+REDIS_URL = config('REDIS_URL')
 REDIS_DB = 0
-CACHES['default']['LOCATION'] = REDIS_URL
-CHANNEL_LAYERS['default']['CONFIG']['hosts'] = [REDIS_URL]
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': f'{REDIS_URL}/{REDIS_DB}',
+    }
+}
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+            'CONFIG': {
+            'hosts': [REDIS_URL],
+        },
+    },
+}
+
+# Celery
+CELERY_BROKER_URL = REDIS_URL
+CELERY_RESULT_BACKEND = CELERY_BROKER_URL
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TIMEZONE = TIME_ZONE
 
 # Security
 CSRF_COOKIE_SECURE = True
