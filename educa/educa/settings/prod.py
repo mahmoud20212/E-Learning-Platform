@@ -11,7 +11,7 @@ ALLOWED_HOSTS = ['*']
 # ALLOWED_HOSTS = ['.educaproject.com']
 
 # Whitenoise settings
-# MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 DATABASES = {
     'default': {

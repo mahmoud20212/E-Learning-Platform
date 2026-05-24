@@ -22,3 +22,5 @@ langchain-huggingface==0.1.2
 huggingface_hub>=0.24,<1
 pgvector==0.3.6
 celery==5.4.0
+django-tailwind
+whitenoise
