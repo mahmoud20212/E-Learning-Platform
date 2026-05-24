@@ -42,11 +42,11 @@ if REDIS_URL:
         'default': {
             'BACKEND': 'django.core.cache.backends.redis.RedisCache',
             'LOCATION': REDIS_URL,
-            'OPTIONS': {
-                'CONNECTION_POOL_KWARGS': {
-                    'ssl_cert_reqs': None
-                }
-            }
+            # 'OPTIONS': {
+            #     'CONNECTION_POOL_KWARGS': {
+            #         'ssl_cert_reqs': None
+            #     }
+            # }
         }
     }
 
