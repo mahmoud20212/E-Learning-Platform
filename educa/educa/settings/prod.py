@@ -14,7 +14,6 @@ if 'courses.middleware.subdomain_course_middleware' in MIDDLEWARE:
 if 'debug_toolbar.middleware.DebugToolbarMiddleware' in MIDDLEWARE:
     MIDDLEWARE.remove('debug_toolbar.middleware.DebugToolbarMiddleware')
 
-# إعداد Whitenoise للملفات الثابتة
 MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
 
 DATABASES = {
@@ -62,7 +61,6 @@ if REDIS_URL:
     CELERY_BROKER_URL = CELERY_REDIS_URL
     CELERY_RESULT_BACKEND = CELERY_REDIS_URL
     
-    # إخبار Celery بعدم التشدد في فحص شهادة الأمان للـ Redis
     CELERY_BROKER_USE_SSL = {
         'ssl_cert_reqs': None
     }
@@ -75,7 +73,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TIMEZONE = TIME_ZONE
 
-# 5. إعدادات الأمان والـ SSL (متوافقة 100% مع الـ Proxy الخاص بـ Render لمنع الـ Redirect Loop)
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
