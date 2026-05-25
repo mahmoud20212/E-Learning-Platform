@@ -1,10 +1,10 @@
 services:
 
-  # cache:
-  #   image: redis:7.0.4
-  #   restart: always
-  #   volumes:
-  #     - ./data/cache:/data
+  cache:
+    image: redis:7.0.4
+    restart: always
+    volumes:
+      - ./data/cache:/data
 
   db:
     image: pgvector/pgvector:pg14
@@ -14,9 +14,9 @@ services:
     volumes:
       - ./data/db:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
 
   web:
     build: .
@@ -26,13 +26,13 @@ services:
       - .:/code
     environment:
       - DJANGO_SETTINGS_MODULE=educa.settings.prod
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=w3ALeOIK1mwkF8AA
+      - POSTGRES_DB=
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
       - POSTGRES_PORT=5432
-      - POSTGRES_HOST=db.prvumqyjsuecguyfsiww.supabase.co
-      - REDIS_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
-      - CELERY_BROKER_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
+      - POSTGRES_HOST=
+      - REDIS_URL=
+      - CELERY_BROKER_URL=
     # depends_on:
     #   - db
     #   - cache
@@ -46,13 +46,13 @@ services:
       - .:/code
     environment:
       - DJANGO_SETTINGS_MODULE=educa.settings.prod
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=w3ALeOIK1mwkF8AA
+      - POSTGRES_DB=
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
       - POSTGRES_PORT=5432
-      - POSTGRES_HOST=db.prvumqyjsuecguyfsiww.supabase.co
-      - REDIS_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
-      - CELERY_BROKER_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
+      - POSTGRES_HOST=
+      - REDIS_URL=
+      - CELERY_BROKER_URL=
     # depends_on:
     #   - db
     #   - cache
@@ -66,22 +66,22 @@ services:
       - .:/code
     environment:
       - DJANGO_SETTINGS_MODULE=educa.settings.prod
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=w3ALeOIK1mwkF8AA
+      - POSTGRES_DB=
+      - POSTGRES_USER=
+      - POSTGRES_PASSWORD=
       - POSTGRES_PORT=5432
-      - POSTGRES_HOST=db.prvumqyjsuecguyfsiww.supabase.co
-      - CELERY_BROKER_URL=rediss://default:gQAAAAAAAXRrAAIgcDIzZjQ2MWNiNTdkNmY0ODdkYWM3YjZlNWNmM2M1NmMxNg@calm-quagga-95339.upstash.io:6379
+      - POSTGRES_HOST=
+      - CELERY_BROKER_URL=
     # depends_on:
     #   - db
     #   - cache
 
-  # nginx:
-  #   image: nginx:1.23.1
-  #   restart: always
-  #   volumes:
-  #     - ./config/nginx:/etc/nginx/templates
-  #     - .:/code
-  #   ports:
-  #     - "80:80"
-  #     - "443:443"
+  nginx:
+    image: nginx:1.23.1
+    restart: always
+    volumes:
+      - ./config/nginx:/etc/nginx/templates
+      - .:/code
+    ports:
+      - "80:80"
+      - "443:443"
